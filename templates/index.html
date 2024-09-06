@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Home Page</h1>
+    <p>learning flask</p>
+    <p>{{students_data}}</p>
+     <table border="2px">
+        <tr>
+            <th>id</th>
+            <th>name</th>
+        </tr>
+        {% for student in students_data%}
+            {% if student['id']%2 == 1 %}
+                <tr>
+                    <td>{{student['id']}}</td>
+                    <td>{{student['name']}}</td>
+                </tr>
+            {%else%}
+                <tr>
+                    <td>{{student['id']}}</td>
+                    <td>{{student['name']}}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        
+     </table>
+</body>
+</html>
