@@ -41,7 +41,7 @@ def sign_up():
 def login():
     if request.method == "GET": # GET
         if 'username' in session.keys():
-            flash("Already Logined", "info")
+            flash("Already logged in", "info")
             return redirect(url_for('user.profile'))
         else:
             flash("Please Type username and password", "info")
@@ -55,7 +55,18 @@ def login():
         session.permanent = True # to reopen borwser and session is saved their
         flash("Successfully login", "info")
         return redirect(url_for('user.profile'))
-    
+
+@app.route('/logout')
+def logout():
+    if("username" in session):
+        session.pop('username')
+    if("password" in session): 
+        session.pop('password')
+    flash("successfully logged out", "info")
+    return redirect(url_for('login')) 
+
+
+
 @app.route("/profile", endpoint='user.profile')
 def show_profile():
     if 'username' in session.keys():
