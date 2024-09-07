@@ -1,0 +1,23 @@
+{% extends 'base.html'%}
+
+{%block title%}
+Login Page
+{%endblock%}
+
+{%block content%}
+{%with messages = get_flashed_messages()%}
+    {% for msg in messages %}
+        <p>{{msg}}</p>
+    {% endfor %}
+{%endwith%}
+
+{%for img in images%}
+    <img src="{{url_for('static', filename='images/'+img)}}" alt="">
+{%endfor%}
+
+<form action="#" method="post">
+    Username: <input type="text" name="nm">
+    Password <input type="password", name="ps">
+    <input type="submit" value="submit">
+</form>
+{%endblock%}
