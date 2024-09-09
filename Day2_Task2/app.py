@@ -5,6 +5,7 @@ from datetime import timedelta
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
+
 app = Flask(__name__)
 app.secret_key = "Ahmed123"  # session key
 app.permanent_session_lifetime = timedelta(days=5)  # session_lifetime
@@ -19,6 +20,7 @@ login_manager.login_message_category = "info"
 # Step-1
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Step-2: Define User Schema
 class User(db.Model):
