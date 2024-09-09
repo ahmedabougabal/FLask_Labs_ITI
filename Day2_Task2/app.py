@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, redirect, request, session, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
 app.secret_key = "Ahmed123"  # session key
@@ -25,7 +26,7 @@ class User(db.Model):
     def __init__(self, username, password=None):
         self.username = username
         if password:
-            self.password = password
+            self.password = generate_password_hash(password)
 
 # Define Book Schema
 class Book(db.Model):
@@ -165,7 +166,7 @@ def add_book():
     if 'username' not in session:
         flash("Please login to add books.", "error")
         return redirect(url_for('login'))
-    
+
     if request.method == 'POST':
         book_title = request.form['title']
         if book_title:
