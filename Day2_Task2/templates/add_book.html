@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}AddBooks{% endblock %}
+
+{% block content %}
+<h1>Add a book</h1>
+<form method="POST" enctype="multipart/form-data">
+    <label for="title">Book Title:</label>
+    <label>
+        <input type="text" name="title" required>
+    </label><br>
+
+    <label for="image">Book Image:</label>
+    <input type="file" name="image" accept="image/*"><br>
+
+    <button type="submit">Add Book</button>
+</form>
+{% endblock %}

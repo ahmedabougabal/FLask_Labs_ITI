@@ -18,6 +18,7 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=True)
     books = db.relationship('Book', backref='owner', lazy="select")  # relationship with books
+    role = db.Column(db.String(10), default='user')
     # backref: how to get data from of books of this user or vise verse: (will be understood in below code)
     # lazy: how tables will get at database background (default is select) check it's types (https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html)
 
@@ -146,6 +147,38 @@ def delete():
     else:
         flash("User not found", "error")
         return redirect(url_for('show_profile'))
+
+
+@app.route("/admin/dashboard", methods=['GET'])
+def admin_dashboard():
+    if 'username' not in session or session.get('role') != 'admin':
+        flash("Access denied. Admins only.", "error")
+        return redirect(url_for("home_page"))
+
+    users = User.query.all()  # Fetch all users
+    books = Book.query.all()  # Fetch all books
+    return render_template("admin_dashboard.html", users=users, books=books)
+
+
+@app.route("/book/add", methods=['GET', 'POST'])
+def add_book():
+    if 'username' not in session:
+        flash("Please login to add books.", "error")
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        book_title = request.form['title']
+        if book_title:
+            user = User.query.filter_by(username=session['username']).first()
+            new_book = Book(title=book_title, user_id=user.id)
+            db.session.add(new_book)
+            db.session.commit()
+            flash("Book added successfully!", "success")
+            return redirect(url_for("user_profile"))
+        else:
+            flash("Book title cannot be empty.", "error")
+
+    return render_template("add_book.html")
 
 
 @app.errorhandler(404)
