@@ -1,0 +1,19 @@
+{% extends "base.html"%}
+
+
+{% block title %}
+    Profile Page
+{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages()%}
+    {% for msg in messages %}
+        {{msg}}
+    {% endfor %}
+{% endwith %}
+<div>
+    <img src="{{url_for('static', filename='images/images_2.png')}}" alt="" width="100" height="100">
+</div>
+<h1>Welcome, {{name}}</h1>
+<p>Your Password is {{password}}</p>
+{% endblock %}
