@@ -8,6 +8,12 @@ app = Flask(__name__)
 app.secret_key = "Ahmed123"  # session key
 app.permanent_session_lifetime = timedelta(days=5)  # session_lifetime
 
+# Initialize Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'  # Specify the login view
+login_manager.login_message_category = "info"
+
+
 # Database configuration
 # Step-1
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
