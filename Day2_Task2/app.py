@@ -50,6 +50,13 @@ class Book(db.Model):
 def home_page():
     return render_template("home.html")
 
+# gets the user id and data each time you go from a route to another
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))  # Fetch the user from the database using the user ID
+
+
+
 
 @app.route("/signup", methods=['GET', 'POST'])
 def sign_up():
@@ -79,28 +86,27 @@ def sign_up():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
-        if 'username' in session.keys():
+        if current_user.is_authenticated:
             flash("Already Logged In", "info")
             return redirect(url_for('user_profile'))
-        else:
-            return render_template("login.html", images=['images_3.png', 'images_4.png'])
+        return render_template("login.html")
     else:  # POST
         user_name = request.form['nm']
         password = request.form['ps']
         user_found = User.query.filter_by(username=user_name).first()
 
         if user_found and check_password_hash(user_found.password, password):
-            session['username'] = user_name
-            session['password'] = user_found.password
-            session.permanent = True
+            login_user(user_found, remember=True)  # Flask-Login handles session management
             flash("Successfully logged in", "info")
             return redirect(url_for('user_profile'))
         else:
             flash("Incorrect credentials", 'info')
-            return redirect(url_for("sign_up"))
+            return redirect(url_for("login"))
+
 
 
 @app.route("/profile", endpoint='user_profile')
+@login_required
 def show_profile():
     if 'username' in session.keys():
         name = session['username']
@@ -112,6 +118,7 @@ def show_profile():
 
 
 @app.route("/logout")
+@login_required
 def logout():
     session.pop('username', None)
     session.pop('password', None)
@@ -119,6 +126,7 @@ def logout():
 
 
 @app.route("/edit", methods=['GET', 'POST'])
+@login_required
 def edit():
     if 'username' not in session:
         flash("You must be logged in to edit your username", "error")
@@ -157,10 +165,11 @@ def delete():
 
 
 @app.route("/admin/dashboard", methods=['GET'])
+@login_required
 def admin_dashboard():
-    if 'username' not in session or session.get('role') != 'admin':
+    if current_user.role != 'admin':
         flash("Access denied. Admins only.", "error")
-        return redirect(url_for("home_page"))
+        return redirect(url_for('home_page'))
 
     users = User.query.all()  # Fetch all users
     books = Book.query.all()  # Fetch all books
