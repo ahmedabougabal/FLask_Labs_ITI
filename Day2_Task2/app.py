@@ -42,6 +42,8 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    #storing images inside the database as BLOB :
+    image = db.Column(db.LargeBinary, nullable=True)  # Image stored as BLOB
 
     def __init__(self, title, user_id=None):
         self.title = title
@@ -180,6 +182,7 @@ def admin_dashboard():
 
 
 @app.route("/book/add", methods=['GET', 'POST'])
+@login_required
 def add_book():
     if 'username' not in session:
         flash("Please login to add books.", "error")
@@ -198,6 +201,42 @@ def add_book():
             flash("Book title cannot be empty.", "error")
 
     return render_template("add_book.html")
+
+
+@app.route("/book/edit/<int:book_id>", methods=['GET', 'POST'])
+@login_required
+def edit_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    if request.method == 'POST':
+        new_title = request.form['title']
+        if new_title:
+            book.title = new_title
+            db.session.commit()
+            flash("Book edited successfully!", "success")
+            return redirect(url_for('user_profile'))
+        else:
+            flash("Book title cannot be empty.", "error")
+
+    return render_template('edit_book.html', book=book)
+
+@app.route("/books") # to view books
+@login_required
+def view_books():
+    user = User.query.filter_by(username=current_user.username).first()
+    books = user.books  # Fetch books of the current user
+    return render_template("view_books.html", books=books)
+
+
+
+@app.route("/book/delete/<int:book_id>", methods=['POST'])
+@login_required
+def delete_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    flash("Book deleted successfully!", "success")
+    return redirect(url_for('user_profile'))
+
 
 
 @app.errorhandler(404)

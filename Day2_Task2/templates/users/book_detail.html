@@ -1,0 +1,11 @@
+{% extends 'users/base.html' %}
+{% block title %}Book Details{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>{{ book.title }}</h2>
+    <img src="data:image/jpeg;base64,{{ book.image|b64encode }}" class="img-fluid" alt="Book Image">
+    <p>{{ book.description }}</p>
+    <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-primary">Edit</a>
+    <a href="{{ url_for('delete_book', book_id=book.id) }}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock %}
